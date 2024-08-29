@@ -24,7 +24,11 @@ export const BurgerConstructorUI: FC<BurgerConstructorUIProps> = ({
         <ConstructorElement
           type='top'
           isLocked
-          text={`${constructorItems.bun.name} (верх)`}
+          text={
+            constructorItems.bun.name
+              ? `${constructorItems.bun.name} (верх)`
+              : 'Выберите булки'
+          }
           price={constructorItems.bun.price}
           thumbnail={constructorItems.bun.image}
         />
@@ -61,7 +65,11 @@ export const BurgerConstructorUI: FC<BurgerConstructorUIProps> = ({
         <ConstructorElement
           type='bottom'
           isLocked
-          text={`${constructorItems.bun.name} (низ)`}
+          text={
+            constructorItems.bun.name
+              ? `${constructorItems.bun.name} (низ)`
+              : 'Выберите булки'
+          }
           price={constructorItems.bun.price}
           thumbnail={constructorItems.bun.image}
         />
