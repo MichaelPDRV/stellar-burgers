@@ -25,7 +25,7 @@ const initialState: UserState = {
 };
 
 export const updateUser = createAsyncThunk('user/update', updateUserApi);
-export const getUser = createAsyncThunk('user/getuser', getUserApi);
+export const getUser = createAsyncThunk('user/getUser', getUserApi);
 export const logout = createAsyncThunk('user/logout', logoutApi);
 export const registerUser = createAsyncThunk(
   'user/registerUser',
