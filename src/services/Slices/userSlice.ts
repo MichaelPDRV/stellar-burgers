@@ -1,16 +1,18 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { loginUserApi, registerUserApi } from '../../utils/burger-api';
 import { TUser } from '../../utils/types';
 import {
   updateUserApi,
   getUserApi,
   logoutApi,
+  loginUserApi,
+  getOrdersApi,
+  registerUserApi,
   TRegisterData
 } from '../../utils/burger-api';
-import { setCookie } from '../../utils/cookie';
+import { setCookie, deleteCookie } from '../../utils/cookie';
 
 type UserState = {
-  user: TUser | null;
+  user: TUser;
   isAuthChecked: boolean;
   loginUserError: string | null;
 };
@@ -24,9 +26,54 @@ const initialState: UserState = {
   loginUserError: null
 };
 
-export const updateUser = createAsyncThunk('user/update', updateUserApi);
-export const getUser = createAsyncThunk('user/getUser', getUserApi);
-export const logout = createAsyncThunk('user/logout', logoutApi);
+export const updateUser = createAsyncThunk(
+  'users/update',
+  async (data: Partial<TRegisterData>) => {
+    try {
+      const response = await updateUserApi(data);
+      return response.user;
+    } catch (error) {
+      throw error;
+    }
+  }
+);
+
+export const getUser = createAsyncThunk(
+  'users/get',
+  async (_, { dispatch }) => {
+    try {
+      const response = await getUserApi();
+      dispatch(getUserOrders());
+      return response.user;
+    } catch (error) {
+      throw error;
+    }
+  }
+);
+
+export const getUserOrders = createAsyncThunk('users/getOrders', async () => {
+  try {
+    const response = await getOrdersApi();
+    return response;
+  } catch (error) {
+    throw error;
+  }
+});
+
+export const logout = createAsyncThunk(
+  'users/logout',
+  async (_, { dispatch }) => {
+    try {
+      await logoutApi();
+      localStorage.clear();
+      deleteCookie('accessToken');
+      dispatch(userLogout());
+    } catch (error) {
+      throw error;
+    }
+  }
+);
+
 export const registerUser = createAsyncThunk(
   'user/registerUser',
   ({ email, name, password }: TRegisterData) =>
@@ -50,7 +97,12 @@ export const loginUser = createAsyncThunk(
 export const userSlice = createSlice({
   name: 'user',
   initialState,
-  reducers: {},
+  reducers: {
+    userLogout: (state) => {
+      state.user = {} as TUser;
+      state.isAuthChecked = false;
+    }
+  },
   extraReducers: (builder) => {
     builder
       .addCase(registerUser.pending, (state) => {
@@ -83,19 +135,26 @@ export const userSlice = createSlice({
       })
       .addCase(updateUser.fulfilled, (state, action) => {
         state.isAuthChecked = true;
-        state.user = action.payload.user;
+        state.user = action.payload;
       })
       .addCase(updateUser.pending, (state) => {
         state.loginUserError = '';
       })
       .addCase(getUser.fulfilled, (state, action) => {
-        state.user = action.payload.user;
+        state.user = action.payload;
         state.isAuthChecked = true;
       })
       .addCase(getUser.rejected, (state, action) => {
         state.isAuthChecked = false;
         state.loginUserError = action.error.message!;
       });
+    builder.addCase(logout.pending, (state) => {
+      state.isAuthChecked = true;
+    });
+    builder.addCase(logout.rejected, (state, action) => {
+      state.isAuthChecked = false;
+      state.loginUserError = action.error.message!;
+    });
     builder.addCase(logout.fulfilled, (state) => {
       state.isAuthChecked = false;
       state.user = { email: '', name: '' };
@@ -112,3 +171,4 @@ export const userSlice = createSlice({
 export const authReducer = userSlice.reducer;
 export const { isAuthCheckedUser, getName, getError } = userSlice.selectors;
 export const selectUser = (state: { user: UserState }) => state.user.user;
+export const { userLogout } = userSlice.actions;
