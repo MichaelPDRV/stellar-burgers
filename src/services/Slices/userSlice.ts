@@ -1,3 +1,4 @@
+//
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { TUser } from '../../utils/types';
 import {
@@ -17,7 +18,7 @@ type UserState = {
   loginUserError: string | null;
 };
 
-const initialState: UserState = {
+export const initialState: UserState = {
   user: {
     email: '',
     name: ''

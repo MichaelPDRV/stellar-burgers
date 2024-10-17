@@ -19,7 +19,7 @@ export const orderReducer = orderSlice.reducer;
 export const ordersReducer = feedSlice.reducer;
 export const allOrdersReducer = allOrdersSlice.reducer;
 
-const rootReducer = combineReducers({
+export const rootReducer = combineReducers({
   ingredients: ingredientsReducer,
   burgerConstructor: burgerConstructorReducer,
   order: orderReducer,
