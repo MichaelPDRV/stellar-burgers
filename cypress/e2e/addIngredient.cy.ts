@@ -1,4 +1,6 @@
 describe('Добавление ингредиентов в конструктор', () => {
+  const bun = 'Краторная булка N-200i';
+
   beforeEach(() => {
     cy.intercept('GET', 'api/ingredients', {
       fixture: 'ingredients.json'
@@ -8,27 +10,19 @@ describe('Добавление ингредиентов в конструкто�
   });
 
   it('Добавление булки в конструктор', () => {
-    cy.get('[data-cy=bun-ingredient]')
-      .contains('Добавить')
-      .click({ force: true });
-    cy.get('[data-cy=bun-top]')
-      .contains('Краторная булка N-200i')
-      .should('exist');
-    cy.get('[data-cy=bun-bottom]')
-      .contains('Краторная булка N-200i')
-      .should('exist');
+    cy.addItemToOrder('bun');
+    cy.get('[data-cy=bun-top]').contains(bun).should('exist');
+    cy.get('[data-cy=bun-bottom]').contains(bun).should('exist');
   });
 
   it('Добавление начинки в конструктор', () => {
-    cy.get('[data-cy=main-ingredient]').contains('Добавить').click();
-    cy.get('[data-cy=sauce-ingredient]')
-      .contains('Добавить')
-      .click({ force: true });
-    cy.get('[data-cy=constructor-ingredients]')
-      .contains('Биокотлета из марсианской Магнолии')
-      .should('exist');
-    cy.get('[data-cy=constructor-ingredients]')
-      .contains('Соус с шипами Антарианского плоскоходца')
-      .should('exist');
+    cy.addIngredientToConstructor(
+      'main-ingredient',
+      'Биокотлета из марсианской Магнолии'
+    );
+    cy.addIngredientToConstructor(
+      'sauce-ingredient',
+      'Соус с шипами Антарианского плоскоходца'
+    );
   });
 });
