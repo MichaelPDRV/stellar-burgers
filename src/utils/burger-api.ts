@@ -2,6 +2,10 @@ import { setCookie, getCookie } from './cookie';
 import { TIngredient, TOrder, TOrdersData, TUser } from './types';
 
 const URL = process.env.BURGER_API_URL;
+if (!URL) {
+  console.error('API URL is not defined. Check your environment variables.');
+}
+console.log('Using API URL:', URL);
 
 const checkResponse = <T>(res: Response): Promise<T> =>
   res.ok ? res.json() : res.json().then((err) => Promise.reject(err));
@@ -75,6 +79,7 @@ export const getIngredientsApi = () =>
   fetch(`${URL}/ingredients`)
     .then((res) => checkResponse<TIngredientsResponse>(res))
     .then((data) => {
+      // console.log('API Data:', data);
       if (data?.success) return data.data;
       return Promise.reject(data);
     });
@@ -138,6 +143,7 @@ export type TRegisterData = {
 };
 
 type TAuthResponse = TServerResponse<{
+  success: boolean;
   refreshToken: string;
   accessToken: string;
   user: TUser;
